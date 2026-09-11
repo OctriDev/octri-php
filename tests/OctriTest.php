@@ -31,4 +31,9 @@ Octri::init(new Config('http://127.0.0.1:1/', "token\r\nX-Injected: true", 'proj
 Octri::captureEvent('ignored', ['eventId' => "event\r\nX-Injected: true"]);
 Octri::captureSpan(['traceId' => '', 'spanId' => '', 'name' => '', 'startTime' => '']);
 
+// A caller-supplied event id becomes a request header, so it is bounded.
+$bounded = new ReflectionMethod(Octri::class, 'safeIdempotencyKey');
+expect($bounded->invoke(null, 'event-123'), 'an ordinary event id is accepted');
+expect(!$bounded->invoke(null, str_repeat('e', 257)), 'an oversized event id is refused');
+
 fwrite(STDOUT, "Octri PHP tests passed\n");

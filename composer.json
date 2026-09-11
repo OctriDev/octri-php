@@ -17,6 +17,6 @@
     "files": ["src/Octri.php"]
   },
   "scripts": {
-    "test": "php tests/OctriTest.php"
+    "test": ["php tests/OctriTest.php", "php tests/ScrubTest.php"]
   }
 }
