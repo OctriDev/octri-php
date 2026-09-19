@@ -68,10 +68,18 @@ expect(str_contains($message, '1234567890123'), 'an order number is not');
 
 // ── The user field ───────────────────────────────────────────────────────────
 
-$user = $scrub(['user' => ['id' => 'u_1', 'email' => 'ada@example.com', 'sessionToken' => 'st_1']])['user'];
-expect($user['email'] === 'ada@example.com', 'the identity you set is reported');
+// The identity the dashboard keys on is `id`, which survives. Direct
+// identifiers under the user are redacted like they are in every generated SDK.
+$user = $scrub(['user' => ['id' => 'u_1', 'email' => 'ada@example.com', 'sessionToken' => 'st_1', 'customerPhone' => '+1 555 0100']])['user'];
 expect($user['id'] === 'u_1', 'the id you set is reported');
+expect($user['email'] === '[redacted]', 'an email under user is redacted');
 expect($user['sessionToken'] === '[redacted]', 'a credential under user is still redacted');
+expect($user['customerPhone'] === '[redacted]', 'an identifier word inside a longer key is redacted');
+
+$context = $scrub(['context' => ['billingAddress' => ['line1' => '1 High St'], 'avatarUrl' => 'https://cdn.example.com/a.png', 'queryTimeMs' => 12]])['context'];
+expect($context['billingAddress'] === '[redacted]', 'address inside a longer key is redacted');
+expect($context['avatarUrl'] === 'https://cdn.example.com/a.png', 'a short ambiguous word is not on the list');
+expect($context['queryTimeMs'] === 12, 'query is not on the list either');
 
 // ── beforeSend ───────────────────────────────────────────────────────────────
 
